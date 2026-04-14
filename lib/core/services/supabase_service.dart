@@ -5,7 +5,7 @@ import '../../models/recordings.dart';
 import '../../models/course.dart';
 
 class SupabaseService {
-  final SupabaseClient _supabase = Supabase.instance.client;
+  SupabaseClient get _supabase => Supabase.instance.client;
 
   // --- Auth Helpers ---
   User? get currentUser => _supabase.auth.currentUser;

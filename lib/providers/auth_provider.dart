@@ -1,6 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:supabase_flutter/supabase_flutter.dart';
 import '../core/services/auth_service.dart';
+
+final authProvider = ChangeNotifierProvider<AuthProvider>((ref) {
+  return AuthProvider();
+});
 
 class AuthProvider extends ChangeNotifier {
   final AuthService _authService = AuthService();
@@ -29,6 +34,36 @@ class AuthProvider extends ChangeNotifier {
         password: password,
         data: {'full_name': name},
       );
+      _setLoading(false);
+      return true;
+    } catch (e) {
+      _setError(e.toString());
+      _setLoading(false);
+      return false;
+    }
+  }
+
+  Future<bool> verifyEmail(String email, String token) async {
+    _setLoading(true);
+    _clearError();
+
+    try {
+      await _authService.verifyEmail(email: email, token: token);
+      _setLoading(false);
+      return true;
+    } catch (e) {
+      _setError(e.toString());
+      _setLoading(false);
+      return false;
+    }
+  }
+
+  Future<bool> resendVerificationEmail(String email) async {
+    _setLoading(true);
+    _clearError();
+
+    try {
+      await _authService.resendVerificationEmail(email);
       _setLoading(false);
       return true;
     } catch (e) {

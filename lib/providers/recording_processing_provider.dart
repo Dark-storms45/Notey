@@ -12,14 +12,16 @@ class ProcessingState {
   final ProcessingStatus status;
   final String? message;
   final String? error;
+  final int? lastProcessedId;
 
-  ProcessingState({this.status = ProcessingStatus.idle, this.message, this.error});
+  ProcessingState({this.status = ProcessingStatus.idle, this.message, this.error, this.lastProcessedId});
 
-  ProcessingState copyWith({ProcessingStatus? status, String? message, String? error}) {
+  ProcessingState copyWith({ProcessingStatus? status, String? message, String? error, int? lastProcessedId}) {
     return ProcessingState(
       status: status ?? this.status,
       message: message ?? this.message,
       error: error ?? this.error,
+      lastProcessedId: lastProcessedId ?? this.lastProcessedId,
     );
   }
 }
@@ -46,7 +48,7 @@ class RecordingProcessingNotifier extends StateNotifier<ProcessingState> {
     this._repository,
   ) : super(ProcessingState());
 
-  Future<void> processRecording(String rawPath, String title, int courseId) async {
+  Future<int?> processRecording(String rawPath, String title, int courseId) async {
     try {
       // 1. Noise Cancellation
       state = state.copyWith(status: ProcessingStatus.cleaning, message: 'Removing background noise...');
@@ -73,9 +75,16 @@ class RecordingProcessingNotifier extends StateNotifier<ProcessingState> {
 
       await _repository.saveNote(note);
 
-      state = state.copyWith(status: ProcessingStatus.completed, message: 'All done!');
+      state = state.copyWith(
+        status: ProcessingStatus.completed, 
+        message: 'All done!',
+        lastProcessedId: note.id,
+      );
+      
+      return note.id;
     } catch (e) {
       state = state.copyWith(status: ProcessingStatus.error, error: e.toString());
+      return null;
     }
   }
 }

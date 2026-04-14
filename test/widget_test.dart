@@ -7,13 +7,18 @@
 
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-
-import 'package:notey/main.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:notey/app/app.dart';
 
 void main() {
   testWidgets('Counter increments smoke test', (WidgetTester tester) async {
     // Build our app and trigger a frame.
-    await tester.pumpWidget(const MyApp());
+    // Wrap with ProviderScope because NOteyApp uses ref.watch(routerProvider)
+    await tester.pumpWidget(
+      const ProviderScope(
+        child: NOteyApp(),
+      ),
+    );
 
     // Verify that our counter starts at 0.
     expect(find.text('0'), findsOneWidget);

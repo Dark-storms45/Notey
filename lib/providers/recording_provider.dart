@@ -1,8 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:isar/isar.dart';
 import '../models/recordings.dart';
 import '../repositories/recording_repository.dart';
 import '../core/services/isar_service.dart';
+
+final recordingsProvider = ChangeNotifierProvider<RecordingProvider>((ref) {
+  return RecordingProvider();
+});
 
 class RecordingProvider extends ChangeNotifier {
   final RecordingRepository _repository = RecordingRepository(IsarService());

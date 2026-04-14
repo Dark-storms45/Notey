@@ -1,7 +1,7 @@
 import 'package:supabase_flutter/supabase_flutter.dart';
 
 class AuthService {
-  final SupabaseClient _supabase = Supabase.instance.client;
+  SupabaseClient get _supabase => Supabase.instance.client;
 
   // Stream of auth state changes (useful for rebuilding UI)
   Stream<AuthState> get authStateChanges => _supabase.auth.onAuthStateChange;
@@ -30,6 +30,35 @@ class AuthService {
       return response;
     } on AuthException catch (e) {
       // Re-throw with a user-friendly message
+      throw Exception(e.message);
+    }
+  }
+
+  // Verify email with OTP code
+  Future<AuthResponse> verifyEmail({
+    required String email,
+    required String token,
+  }) async {
+    try {
+      final response = await _supabase.auth.verifyOTP(
+        email: email,
+        token: token,
+        type: OtpType.signup,
+      );
+      return response;
+    } on AuthException catch (e) {
+      throw Exception(e.message);
+    }
+  }
+
+  // Resend verification email
+  Future<void> resendVerificationEmail(String email) async {
+    try {
+      await _supabase.auth.resend(
+        type: OtpType.signup,
+        email: email,
+      );
+    } on AuthException catch (e) {
       throw Exception(e.message);
     }
   }

@@ -1,8 +1,14 @@
 import 'dart:async';
 import 'package:flutter/foundation.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:record/record.dart';
 import '../core/services/audio_recording_service.dart';
 
 enum RecorderStatus { idle, recording, paused }
+
+final recorderProvider = ChangeNotifierProvider<RecorderProvider>((ref) {
+  return RecorderProvider();
+});
 
 class RecorderProvider extends ChangeNotifier {
   final AudioRecordingService _service = AudioRecordingService();
@@ -14,6 +20,8 @@ class RecorderProvider extends ChangeNotifier {
   RecorderStatus get status => _status;
   Duration get duration => _duration;
   bool get isRecording => _status == RecorderStatus.recording;
+
+  Stream<Amplitude> get amplitudeStream => _service.getAmplitude();
 
   Future<void> start() async {
     try {
